@@ -1,6 +1,7 @@
 package jedla.project.mines;
 
 import java.awt.EventQueue;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.JButton;
@@ -31,98 +32,138 @@ public class MainApp {
 	 * Create the application.
 	 */
 	public MainApp() {
-		initialize();
+		Rules r = new Rules();
+		ArrayList<ArrayList<Cell>> list = initialize();
+		r.setBombs(list);
+		r.findNearBomb(list);
+		r.showBombs(list);
+		System.out.println();
 	}
 
 	/**
 	 * Initialize the contents of the frame.
 	 */
-	private void initialize() {
+	private ArrayList<ArrayList<Cell>> initialize() {
+		ArrayList<ArrayList<Cell>> cels = new ArrayList<ArrayList<Cell>>(); // for cells
 		frame = new JFrame();
 		frame.setResizable(false);
 		frame.setBounds(100, 100, 514, 579);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
+		// create dynamic field of buttons
+		// for now is set to 10x10 field
+		for(int i = 40; i <= 490 ;i = i + 50) {
+			ArrayList<Cell> cel = new ArrayList<Cell>();
+			for(int j = 0; j <= 450 ;j = j + 50) {
+				JButton button = new JButton("");
+				button.setBounds(j, i, 50, 50);
+				frame.getContentPane().add(button);
+				Cell c = new Cell(button);
+				cel.add(c);				
+			}
+			cels.add(cel);
+		}
+		/**
 		JButton  cell_1_1 = new JButton("");
 		cell_1_1.setBounds(0, 40, 50, 50);
 		frame.getContentPane().add(cell_1_1);
+		jButtons.add(cell_1_1);
 		
 		JButton cell_2_1 = new JButton("");
 		cell_2_1.setBounds(50, 40, 50, 50);
 		frame.getContentPane().add(cell_2_1);
+		jButtons.add(cell_2_1);
 
 		JButton cell_3_1 = new JButton("");
 		cell_3_1.setBounds(100, 40, 50, 50);
 		frame.getContentPane().add(cell_3_1);
+		jButtons.add(cell_3_1);
 		
 		JButton cell_4_1 = new JButton("");
 		cell_4_1.setBounds(150, 40, 50, 50);
 		frame.getContentPane().add(cell_4_1);
+		jButtons.add(cell_4_1);
 		
 		JButton cell_5_1 = new JButton("");
 		cell_5_1.setBounds(200, 40, 50, 50);
 		frame.getContentPane().add(cell_5_1);
+		jButtons.add(cell_5_1);
 		
 		JButton cell_6_1 = new JButton("");
 		cell_6_1.setBounds(250, 40, 50, 50);
 		frame.getContentPane().add(cell_6_1);
+		jButtons.add(cell_6_1);
 		
 		JButton cell_7_1 = new JButton("");
 		cell_7_1.setBounds(300, 40, 50, 50);
 		frame.getContentPane().add(cell_7_1);
+		jButtons.add(cell_7_1);
 		
 		JButton cell_8_1 = new JButton("");
 		cell_8_1.setBounds(350, 40, 50, 50);
 		frame.getContentPane().add(cell_8_1);
+		jButtons.add(cell_8_1);
 		
 		JButton cell_9_1 = new JButton("");
 		cell_9_1.setBounds(400, 40, 50, 50);
 		frame.getContentPane().add(cell_9_1);
+		jButtons.add(cell_9_1);
 		
 		JButton cell_10_1 = new JButton("");
 		cell_10_1.setBounds(450, 40, 50, 50);
 		frame.getContentPane().add(cell_10_1);
+		jButtons.add(cell_10_1);
 		
 		JButton cell_1_2 = new JButton("");
 		cell_1_2.setBounds(0, 90, 50, 50);
 		frame.getContentPane().add(cell_1_2);
+		jButtons.add(cell_1_2);
 		
 		JButton cell_2_2 = new JButton("");
 		cell_2_2.setBounds(50, 90, 50, 50);
 		frame.getContentPane().add(cell_2_2);
+		jButtons.add(cell_2_2);
 		
 		JButton cell_3_2 = new JButton("");
 		cell_3_2.setBounds(100, 90, 50, 50);
 		frame.getContentPane().add(cell_3_2);
+		jButtons.add(cell_3_2);
 		
 		JButton cell_4_2 = new JButton("");
 		cell_4_2.setBounds(150, 90, 50, 50);
 		frame.getContentPane().add(cell_4_2);
+		jButtons.add(cell_4_2);
 		
 		JButton cell_5_2 = new JButton("");
 		cell_5_2.setBounds(200, 90, 50, 50);
 		frame.getContentPane().add(cell_5_2);
+		jButtons.add(cell_5_2);
 		
 		JButton cell_6_2 = new JButton("");
 		cell_6_2.setBounds(250, 90, 50, 50);
 		frame.getContentPane().add(cell_6_2);
+		jButtons.add(cell_6_2);
 		
 		JButton cell_7_2 = new JButton("");
 		cell_7_2.setBounds(300, 90, 50, 50);
 		frame.getContentPane().add(cell_7_2);
+		jButtons.add(cell_7_2);
 		
 		JButton cell_8_2 = new JButton("");
 		cell_8_2.setBounds(350, 90, 50, 50);
 		frame.getContentPane().add(cell_8_2);
+		jButtons.add(cell_8_2);
 		
 		JButton cell_9_2 = new JButton("");
 		cell_9_2.setBounds(400, 90, 50, 50);
 		frame.getContentPane().add(cell_9_2);
+		jButtons.add(cell_9_2);
 		
 		JButton cell_10_2 = new JButton("");
 		cell_10_2.setBounds(450, 90, 50, 50);
 		frame.getContentPane().add(cell_10_2);
+		jButtons.add(cell_10_2);
 		
 		JButton cell_1_3 = new JButton("");
 		cell_1_3.setBounds(0, 140, 50, 50);
@@ -443,7 +484,7 @@ public class MainApp {
 		JButton cell_10_10 = new JButton("");
 		cell_10_10.setBounds(450, 490, 50, 50);
 		frame.getContentPane().add(cell_10_10);
-		
+		**/
 		JButton newGame = new JButton("NewGame");
 		newGame.setBounds(205, 0, 85, 40);
 		frame.getContentPane().add(newGame);
@@ -460,5 +501,6 @@ public class MainApp {
 		JButton flag_1 = new JButton("Flag");
 		flag_1.setBounds(405, 0, 85, 40);
 		frame.getContentPane().add(flag_1);
+		return cels;
 	}
 }
