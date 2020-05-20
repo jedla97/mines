@@ -1,6 +1,5 @@
 package jedla.project.mines;
 
-import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -65,9 +64,7 @@ public class MainApp {
 
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						button.setBackground(Color.blue);
 						r.onClicAction(cels, button);
-						button.setEnabled(false);
 					}
 					
 				});
