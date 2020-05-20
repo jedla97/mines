@@ -1,14 +1,22 @@
 package jedla.project.mines;
 
 import java.awt.Color;
+import java.awt.Image;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
-
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JTextField;
 
 public class Rules {
+	private ImageIcon flag = new ImageIcon(new ImageIcon(getClass().getResource("flag.png")).getImage()
+			.getScaledInstance(30, 30, Image.SCALE_DEFAULT));
+	private ImageIcon bomb = new ImageIcon(new ImageIcon(getClass().getResource("bomb.png")).getImage()
+			.getScaledInstance(30, 30, Image.SCALE_DEFAULT));
+	private ImageIcon notbomb = new ImageIcon(new ImageIcon(getClass().getResource("notbomb.png")).getImage()
+			.getScaledInstance(30, 30, Image.SCALE_DEFAULT));
 	private Random rand = new Random();
 	private static Color miku = new Color(0, 236, 255); // for 0 bombs cells
 	private static Color kaito = new Color(34, 9, 195); // for 1 bombs cells
@@ -26,16 +34,19 @@ public class Rules {
 		// get id of clicked cell
 		int[] position = this.findIdOfCell(arr, button);
 		// if clicked on bomb show all bomb and disable buttons
-		if (arr.get(position[0]).get(position[1]).isBomb() == true) {
+		if (arr.get(position[0]).get(position[1]).isBomb() == true
+				&& arr.get(position[0]).get(position[1]).isFlag() != true) {
 			this.showBombs(arr);
 			this.disableButtons(arr);
-		} 
+		}
 		// if clicked on cell which is not near bomb all nearly cells will be revealed
-		else if (arr.get(position[0]).get(position[1]).getNearBomb() == 0) {
+		else if (arr.get(position[0]).get(position[1]).getNearBomb() == 0
+				&& arr.get(position[0]).get(position[1]).isFlag() != true) {
 			this.findAllZeros(arr, position);
-		} 
+		}
 		// if near bomb show only how many bomb is near
-		else {
+		else if (arr.get(position[0]).get(position[1]).getNearBomb() > 0
+				&& arr.get(position[0]).get(position[1]).isFlag() != true) {
 			this.showNumberOfNearBomb(arr, position);
 		}
 	}
@@ -48,10 +59,11 @@ public class Rules {
 		while (open.peek() != null) {
 			int[] pos = open.poll(); // get position from queue
 			// if close contains position its not necessary vitit it again
-			if (this.containsPosition(close, pos) == false) { 
+			if (this.containsPosition(close, pos) == false) {
 				// only use position which is not out of range
 				if (pos[0] >= 0 && pos[0] <= 9 && pos[1] >= 0 && pos[1] <= 9) {
-					if (arr.get(pos[0]).get(pos[1]).getNearBomb() == 0) {
+					if (arr.get(pos[0]).get(pos[1]).getNearBomb() == 0
+							&& arr.get(pos[0]).get(pos[1]).isFlag() == false) {
 						this.setZeroCell(arr, pos[0], pos[1]);
 						// set near position and add them to queue
 						int[] posMinusY = { pos[0], pos[1] - 1 };
@@ -62,6 +74,10 @@ public class Rules {
 						open.add(posPlusY);
 						open.add(posMinusX);
 						open.add(posPlusX);
+					}
+					// catch when flag cell is mark as flag
+					else if (arr.get(pos[0]).get(pos[1]).isFlag() == true) {
+
 					}
 					// if bomb is near show cell with number to create border
 					else {
@@ -90,6 +106,7 @@ public class Rules {
 	public void setZeroCell(ArrayList<ArrayList<Cell>> arr, int positionX, int positionY) {
 		arr.get(positionX).get(positionY).getCel().setBackground(miku);
 		arr.get(positionX).get(positionY).getCel().setEnabled(false);
+		arr.get(positionX).get(positionY).setUncovered(true);
 	}
 
 	// help for finding positions of cell
@@ -116,26 +133,34 @@ public class Rules {
 		for (int i = 0; i < 10; i++) {
 			randX = rand.nextInt(10);
 			randY = rand.nextInt(10);
-			arr.get(randX).get(randY).setBomb(true);
+			if (arr.get(randX).get(randY).isBomb() == false) {
+				arr.get(randX).get(randY).setBomb(true);
+			} else {
+				i--;
+			}
 		}
 	}
 
 	// show all bombs and numbers of near bomb
-	// TODO delete else branch
+	// TODO delete else branch in finished builds
 	public void showBombs(ArrayList<ArrayList<Cell>> arr) {
-		//int nearBomb; // number of near bomb from Cell
+		// int nearBomb; // number of near bomb from Cell
 		for (int i = 0; i < arr.size(); i++) {
 			for (int j = 0; j < arr.get(i).size(); j++) {
 				// if cell contains bomb set text on button to B and RED background
 				if (arr.get(i).get(j).isBomb() == true) {
-					arr.get(i).get(j).getCel().setText("B");
-					arr.get(i).get(j).getCel().setBackground(meiko);
-				}/*
-				// set number of near bomb on button
-				else {
-					nearBomb = arr.get(i).get(j).getNearBomb();
-					//arr.get(i).get(j).getCel().setText(Integer.toString(nearBomb));
-				}*/
+					if(arr.get(i).get(j).isFlag() == true) {
+						arr.get(i).get(j).getCel().setIcon(notbomb);
+						arr.get(i).get(j).getCel().setBackground(meiko);
+					}else {
+						arr.get(i).get(j).getCel().setIcon(bomb);
+						arr.get(i).get(j).getCel().setBackground(meiko);
+					}
+				} /*
+					 * // set number of near bomb on button else { nearBomb =
+					 * arr.get(i).get(j).getNearBomb();
+					 * //arr.get(i).get(j).getCel().setText(Integer.toString(nearBomb)); }
+					 */
 			}
 
 		}
@@ -163,6 +188,7 @@ public class Rules {
 		}
 		arr.get(position[0]).get(position[1]).getCel().setText(Integer.toString(nearBomb));
 		arr.get(position[0]).get(position[1]).getCel().setEnabled(false);
+		arr.get(position[0]).get(position[1]).setUncovered(true);
 
 	}
 
@@ -177,6 +203,9 @@ public class Rules {
 
 	}
 
+	// TODO rewrite this function for less code
+	// TODO compare these 2 methods for time efficiency
+	// find and set near bomb for all cells used for initialization
 	public void findNearBomb(ArrayList<ArrayList<Cell>> arr) {
 		int counter;
 		for (int i = 0; i < arr.size(); i++) {
@@ -340,5 +369,79 @@ public class Rules {
 				arr.get(i).get(j).setNearBomb(counter);
 			}
 		}
+	}
+
+	// reset field used when new game start
+	public void resetFeild(ArrayList<ArrayList<Cell>> arr) {
+		for (int i = 0; i < arr.size(); i++) {
+			for (int j = 0; j < arr.get(i).size(); j++) {
+				arr.get(i).get(j).setBomb(false);
+				arr.get(i).get(j).getCel().setEnabled(true);
+				arr.get(i).get(j).getCel().setText("");
+				arr.get(i).get(j).getCel().setBackground(null);
+				arr.get(i).get(j).getCel().setIcon(null);
+				arr.get(i).get(j).setUncovered(true);
+			}
+
+		}
+	}
+
+	// initialization for new game
+	public void initCell(ArrayList<ArrayList<Cell>> arr) {
+		this.resetFeild(arr);
+		this.setBombs(arr);
+		this.findNearBomb(arr);
+	}
+
+	// set number of used flags to text field
+	public void setCounter(JTextField flagCounter, int counter) {
+		flagCounter.setText("Used flags = " + Integer.toString(counter));
+	}
+
+	// set flag on cell
+	public void setFlag(ArrayList<ArrayList<Cell>> arr, JButton button) {
+		int[] position = this.findIdOfCell(arr, button);
+		// when cell is not mark with flag
+		if (arr.get(position[0]).get(position[1]).isFlag() == false) {
+			arr.get(position[0]).get(position[1]).setFlag(true);
+			arr.get(position[0]).get(position[1]).getCel().setIcon(flag);
+			arr.get(position[0]).get(position[1]).getCel().setBackground(salamandre);
+		}
+		// remove flag from cell
+		else {
+			arr.get(position[0]).get(position[1]).setFlag(false);
+			arr.get(position[0]).get(position[1]).getCel().setIcon(null);
+			arr.get(position[0]).get(position[1]).getCel().setBackground(null);
+		}
+
+	}
+
+	// return number of used flags on field
+	public int numberOfFlags(ArrayList<ArrayList<Cell>> arr) {
+		int counter = 0;
+		for (int i = 0; i < arr.size(); i++) {
+			for (int j = 0; j < arr.get(i).size(); j++) {
+				if (arr.get(i).get(j).isFlag() == true) {
+					counter++;
+				}
+			}
+
+		}
+		return counter;
+	}
+
+	// check if player win the game
+	public boolean isWinner(ArrayList<ArrayList<Cell>> arr) {
+		for (int i = 0; i < arr.size(); i++) {
+			for (int j = 0; j < arr.get(i).size(); j++) {
+				if (arr.get(i).get(j).isUncovered() != true && arr.get(i).get(j).isBomb() != true) {
+					return false;
+				} else if (arr.get(i).get(j).isBomb() == true && arr.get(i).get(j).isFlag() != true) {
+					return false;
+				}
+
+			}
+		}
+		return true;
 	}
 }
